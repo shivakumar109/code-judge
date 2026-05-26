@@ -1,0 +1,139 @@
+### Get API Health Status
+GET http://localhost:5000/health
+
+### COMMON ENDPOINTS (AUTHENTICATION)
+### Register a New User Account (Standard User Role)
+POST http://localhost:5000/api/common-api/register
+Content-Type: application/json
+
+{
+  "firstName": "user1",
+  "lastName": "user1",
+  "username": "user1",
+  "email": "user1@gmail.com",
+  "password": "user1@123",
+  "role": "user"
+}
+
+### Register a New User Account (Admin Role)
+POST http://localhost:5000/api/common-api/register
+Content-Type: application/json
+
+{
+  "firstName": "Admin1",
+  "lastName": "Admin1",
+  "username": "admin",
+  "email": "admin@gmail.com",
+  "password": "admin1@123",
+  "role": "admin"
+}
+
+### Login as User/Admin (Using Email)
+POST http://localhost:5000/api/common-api/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "admin1@123"
+}
+
+### Login as User/Admin (Using Username)
+POST http://localhost:5000/api/common-api/login
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "password": "user1@123"
+}
+
+### Logout (Clears HTTP-Only Cookie)
+GET http://localhost:5000/api/common-api/logout
+
+### USER ENDPOINTS (Requires 'USER' Role Toke
+
+### Fetch Logged-In User Profile Details
+GET http://localhost:5000/api/user-api/profile
+
+
+### Fetch All Active Coding Problems (Excludes hiddenTestCases)
+GET http://localhost:5000/api/user-api/problems
+
+### Fetch Details of a Single Active Problem by ID
+GET http://localhost:5000/api/user-api/problem/6a130c0b401cd7cfde71b683
+
+
+### Submit Code to Judge0 (Executes hiddenTestCases)
+### Supported languages: javascript, python, cpp, java
+POST http://localhost:5000/api/user-api/submit
+Content-Type: application/json
+
+{
+  "problemId": "6a130c0b401cd7cfde71b683",
+
+  "code": "n, target = map(int, input().split())\nnums = list(map(int, input().split()))\nlookup = {}\nfor i, num in enumerate(nums):\n    diff = target - num\n    if diff in lookup:\n        print(lookup[diff], i)\n        break\n    lookup[num] = i",
+
+  "language": "python"
+}
+
+### Fetch Submission History for the Logged-In User
+GET http://localhost:5000/api/user-api/submissions
+
+### Fetch Public User Leaderboard (Sorted by points descending)
+GET http://localhost:5000/api/user-api/leaderboard
+
+
+### ADMIN ENDPOINTS (Requires 'ADMIN' Role Token)
+
+### Create a New Coding Problem (Requires at least 3 hidden test cases)
+POST http://localhost:5000/api/admin-api/problems
+Content-Type: application/json
+
+{
+  "title": "Reverse String Custom",
+  "description": "Reverse a given string. The input is provided as a single word.",
+  "constraints": "1 <= length of S <= 10^5",
+  "inputFormat": "A single line containing string S.",
+  "outputFormat": "Output the reversed string.",
+  "sampleInput": "hello",
+  "sampleOutput": "olleh",
+  "explanation": "Reversing 'hello' gives 'olleh'.",
+  "difficulty": "Easy",
+  "tags": ["Strings", "Basic"],
+  "hiddenTestCases": [
+    {
+      "input": "Hannah",
+      "output": "hannaH"
+    },
+    {
+      "input": "a",
+      "output": "a"
+    },
+    {
+      "input": "antigravity",
+      "output": "ytivargitna"
+    }
+  ]
+}
+
+### Update an Existing Coding Problem
+PUT http://localhost:5000/api/admin-api/problems/6a130c0b401cd7cfde71b6e3
+Content-Type: application/json
+
+{
+  "difficulty": "Medium",
+  "tags": ["Strings", "Algorithms", "Updated"]
+}
+
+### Soft Delete (Deactivate) a Problem
+DELETE http://localhost:5000/api/admin-api/problems/6a130c0b401cd7cfde71b6e3
+
+
+### Block a User Account (Sets isActive = false)
+PUT http://localhost:5000/api/admin-api/block-user/6a130e5407723b57e30f8251
+
+### Unblock a User Account (Sets isActive = true)
+PUT http://localhost:5000/api/admin-api/unblock-user/6a130e5407723b57e30f8251
+
+
+### Fetch Admin Version of Leaderboard (Includes inactive users, emails, etc.)
+GET http://localhost:5000/api/admin-api/leaderboard
