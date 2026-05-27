@@ -1,5 +1,6 @@
-services:
+version: '3.8'
 
+services:
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -54,3 +55,17 @@ services:
     depends_on:
       - redis
       - db
+
+  backend:
+    build: .
+    container_name: code-judge-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - PORT=5000
+      - JUDGE0_URL=http://judge0:2358
+    depends_on:
+      - server
