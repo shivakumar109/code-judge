@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { useProblemStore } from '../Store/problemStore.js';
 import { useSubmissionStore } from '../Store/submissionStore.js';
@@ -13,6 +13,7 @@ import {
 export const Workspace = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const { selectedProblem, fetchProblemById } = useProblemStore();
   const { 
@@ -31,7 +32,7 @@ export const Workspace = () => {
     runError
   } = useSubmissionStore();
 
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState('description'); // description | submissions
   const [consoleTab, setConsoleTab] = useState('output'); // Console display: output | testcases
@@ -65,13 +66,41 @@ export const Workspace = () => {
     fetchSubmissions();
   }, [id, fetchProblemById, fetchSubmissions, isAuthenticated, navigate, clearResults]);
 
-  // Set default templates when problem loads or language shifts
+  // Load draft from localStorage or state when problem ID or language changes
   useEffect(() => {
-    setCode(templates[language]);
-  }, [language]);
+    if (location.state?.draftCode) {
+      setCode(location.state.draftCode);
+      const passedLang = location.state.draftLanguage || language;
+      if (location.state?.draftLanguage) {
+        setLanguage(location.state.draftLanguage);
+      }
+      const draftKey = `draft-${user?._id || 'guest'}-${id}-${passedLang}`;
+      localStorage.setItem(draftKey, location.state.draftCode);
+      window.history.replaceState({}, document.title);
+      return;
+    }
+
+    const draftKey = `draft-${user?._id || 'guest'}-${id}-${language}`;
+    const savedDraft = localStorage.getItem(draftKey);
+    if (savedDraft !== null) {
+      setCode(savedDraft);
+    } else {
+      setCode(templates[language]);
+    }
+  }, [id, language, user?._id]);
+
+  // Automatically save code to localStorage whenever it changes
+  useEffect(() => {
+    if (code && code.trim() !== '') {
+      const draftKey = `draft-${user?._id || 'guest'}-${id}-${language}`;
+      localStorage.setItem(draftKey, code);
+    }
+  }, [code, id, language, user?._id]);
 
   const handleLanguageChange = (e) => {
-    setLanguage(e.target.value);
+    const newLang = e.target.value;
+    setLanguage(newLang);
+    setCode(templates[newLang]);
   };
 
   const handleSubmit = async () => {

@@ -1,11 +1,15 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Problem from '../Models/Problem.js';
 import User from '../Models/User.js';
 import Submission from '../Models/Submission.js';
 import { verifyToken } from '../Middlewares/verifyToken.js';
 import { executeTestCases, runCode } from '../Services/judge0.service.js';
 import { getLanguageId } from '../Utils/judge0Map.js';
+import { compareOutput } from '../Utils/compareOutput.js';
 import bcrypt from 'bcryptjs';
+import upload from '../Middlewares/upload.js';
+import cloudinary from '../Config/cloudinary.js';
 
 const router = express.Router();
 
@@ -16,7 +20,7 @@ const router = express.Router();
 router.get('/profile', verifyToken('USER'), async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .select('firstName lastName username email points solvedProblems profileImage isActive')
+      .select('_id firstName lastName username email points solvedProblems profileImage isActive role')
       .populate({
         path: 'solvedProblems',
         select: 'title difficulty tags',
@@ -27,18 +31,22 @@ router.get('/profile', verifyToken('USER'), async (req, res) => {
       return res.status(404).json({ message: 'User profile not found' });
     }
 
+    const validSolvedProblems = (user.solvedProblems || []).filter(p => p !== null);
+
     return res.status(200).json({
       message: 'Profile retrieved successfully',
       profile: {
+        _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
         email: user.email,
         points: user.points,
-        solvedProblems: user.solvedProblems,
+        solvedProblems: validSolvedProblems,
         profileImage: user.profileImage,
         isActive: user.isActive,
-        solvedCount: user.solvedProblems.length
+        solvedCount: validSolvedProblems.length,
+        role: user.role
       }
     });
   } catch (error) {
@@ -56,7 +64,7 @@ router.get('/problems', verifyToken('USER'), async (req, res) => {
     // Only return active problems, exclude hiddenTestCases for security
     const problems = await Problem.find({ isProblemActive: true })
       .select('-hiddenTestCases')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: 1 });
 
     return res.status(200).json({
       message: 'Active problems fetched successfully',
@@ -75,6 +83,10 @@ router.get('/problems', verifyToken('USER'), async (req, res) => {
 router.get('/problem/:problemId', verifyToken('USER'), async (req, res) => {
   try {
     const { problemId } = req.params;
+
+    if (!mongoose.isValidObjectId(problemId)) {
+      return res.status(400).json({ message: 'Invalid problem ID format' });
+    }
 
     const problem = await Problem.findOne({ _id: problemId, isProblemActive: true })
       .select('-hiddenTestCases');
@@ -108,6 +120,12 @@ router.post('/submit', verifyToken('USER'), async (req, res) => {
     if (!problemId || !code || !language) {
       return res.status(400).json({
         message: 'problemId, code, and language fields are required',
+      });
+    }
+
+    if (!mongoose.isValidObjectId(problemId)) {
+      return res.status(400).json({
+        message: 'Invalid problem ID format',
       });
     }
 
@@ -268,13 +286,20 @@ router.get('/leaderboard', verifyToken('USER'), async (req, res) => {
 router.post('/run', verifyToken('USER'), async (req, res) => {
   try {
     const { problemId, code, language, customInput } = req.body;
-
+    // Validate request body
     if (!problemId || !code || !language) {
       return res.status(400).json({
         message: 'problemId, code, and language fields are required',
       });
     }
 
+    if (!mongoose.isValidObjectId(problemId)) {
+      return res.status(400).json({
+        message: 'Invalid problem ID format',
+      });
+    }
+
+    // Get Judge0 language ID
     const languageId = getLanguageId(language);
     if (!languageId) {
       return res.status(400).json({
@@ -282,59 +307,131 @@ router.post('/run', verifyToken('USER'), async (req, res) => {
       });
     }
 
-    const problem = await Problem.findOne({ _id: problemId, isProblemActive: true });
+    // Find active problem
+    const problem = await Problem.findOne({
+      _id: problemId,
+      isProblemActive: true,
+    });
+
     if (!problem) {
-      return res.status(404).json({ message: 'Problem not found or is inactive' });
+      return res.status(404).json({
+        message: 'Problem not found or inactive',
+      });
     }
 
-    // 1. Run the sample/base test case
     const sampleInput = problem.sampleInput;
     const sampleExpectedOutput = problem.sampleOutput;
 
-    const sampleResult = await runCode(code, languageId, sampleInput);
+    const sampleResult = await runCode(
+      code,
+      languageId,
+      sampleInput
+    );
 
-    let customResult = null;
-    // 2. Run the custom input test case if provided
-    if (customInput !== undefined && customInput !== null && customInput.trim() !== '') {
-      customResult = await runCode(code, languageId, customInput);
+    let finalSampleStatus = sampleResult.status;
+
+    // Judge0 Status ID 3 => Executed Successfully
+    if (sampleResult.statusId === 3) {
+
+      const isCorrect = compareOutput(
+        sampleResult.stdout,
+        sampleExpectedOutput
+      );
+
+      finalSampleStatus = isCorrect
+        ? 'Accepted'
+        : 'Wrong Answer';
     }
 
+
+    let customResult = null;
+
+    if (
+      customInput !== undefined &&
+      customInput !== null &&
+      String(customInput).trim() !== ''
+    ) {
+
+      const customExecution = await runCode(
+        code,
+        languageId,
+        customInput
+      );
+
+      customResult = {
+        input: customInput,
+        actual: customExecution.stdout || '',
+        status: customExecution.status,
+        statusId: customExecution.statusId,
+        stderr: customExecution.stderr || '',
+        compileOutput: customExecution.compileOutput || '',
+        runtime: customExecution.runtime,
+        memory: customExecution.memory,
+      };
+    }
     return res.status(200).json({
       message: 'Run execution completed',
+
       sampleResult: {
         input: sampleInput,
         expected: sampleExpectedOutput,
         actual: sampleResult.stdout || '',
-        status: sampleResult.status,
+        status: finalSampleStatus,
         statusId: sampleResult.statusId,
         stderr: sampleResult.stderr || '',
         compileOutput: sampleResult.compileOutput || '',
         runtime: sampleResult.runtime,
         memory: sampleResult.memory,
       },
-      customResult: customResult ? {
-        input: customInput,
-        actual: customResult.stdout || '',
-        status: customResult.status,
-        statusId: customResult.statusId,
-        stderr: customResult.stderr || '',
-        compileOutput: customResult.compileOutput || '',
-        runtime: customResult.runtime,
-        memory: customResult.memory,
-      } : null,
+
+      customResult,
     });
+
   } catch (error) {
-    console.error('Run code error:', error);
-    return res.status(500).json({ message: 'Internal server error while running code' });
+
+    console.error('Run route error:', error);
+
+    return res.status(500).json({
+      message: 'Internal server error while running code',
+    });
   }
 });
 
 /**
- * PUT /profile
+ * POST /upload-avatar
+ * Accepts a file, uploads it to Cloudinary, and returns the secure URL.
+ */
+router.post('/upload-avatar', verifyToken('USER'), upload.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Convert memory buffer to base64 string for Cloudinary upload
+    const fileBase64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(fileBase64, {
+      folder: 'codejudge_profiles',
+      resource_type: 'image',
+    });
+
+    return res.status(200).json({
+      message: 'Image uploaded successfully',
+      secure_url: result.secure_url,
+    });
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    return res.status(500).json({ message: error.message || 'Failed to upload image to Cloudinary' });
+  }
+});
+
+/**
+ * PUT /edit-profile
  * Allow authenticated users to edit profile details (firstName, lastName, username, email, password, profileImage).
  */
-router.put('/profile', verifyToken('USER'), async (req, res) => {
-  try {
+router.put('/edit-profile', verifyToken('USER'), async (req, res) => {
+  try { 
     const userId = req.user._id;
     const { firstName, lastName, username, email, password, profileImage } = req.body;
 
@@ -377,6 +474,7 @@ router.put('/profile', verifyToken('USER'), async (req, res) => {
     return res.status(200).json({
       message: 'Profile updated successfully',
       profile: {
+        _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
@@ -385,6 +483,7 @@ router.put('/profile', verifyToken('USER'), async (req, res) => {
         solvedProblems: user.solvedProblems,
         profileImage: user.profileImage,
         isActive: user.isActive,
+        role: user.role
       }
     });
   } catch (error) {
@@ -423,6 +522,36 @@ router.get('/submissions/:submissionId', verifyToken('USER'), async (req, res) =
       return res.status(400).json({ message: 'Invalid submission ID format' });
     }
     return res.status(500).json({ message: 'Internal server error while fetching submission' });
+  }
+});
+
+/**
+ * GET /solved-problems
+ * Fetch all solved problems for the logged-in user.
+ */
+router.get('/solved-problems', verifyToken('USER'), async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select('solvedProblems')
+      .populate({
+        path: 'solvedProblems',
+        select: 'title difficulty tags constraints sampleInput sampleOutput explanation description inputFormat outputFormat',
+        match: { isProblemActive: true }
+      });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const validSolvedProblems = (user.solvedProblems || []).filter(p => p !== null);
+
+    return res.status(200).json({
+      message: 'Solved problems fetched successfully',
+      solvedProblems: validSolvedProblems
+    });
+  } catch (error) {
+    console.error('Error fetching solved problems:', error);
+    return res.status(500).json({ message: 'Internal server error while fetching solved problems' });
   }
 });
 

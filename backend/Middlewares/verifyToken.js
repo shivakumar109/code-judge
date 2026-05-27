@@ -52,8 +52,12 @@ export const verifyToken = (requiredRole = null) => {
         });
       }
 
-      // Role authorization check
-      if (requiredRole && user.role.toLowerCase() !== requiredRole.toLowerCase()) {
+      // Role authorization check: 'admin' role automatically inherits all 'user' privileges
+      if (
+        requiredRole &&
+        user.role.toLowerCase() !== requiredRole.toLowerCase() &&
+        user.role.toLowerCase() !== 'admin'
+      ) {
         return res.status(403).json({
           message: "Forbidden. You don't have permission"
         });

@@ -78,8 +78,38 @@ Content-Type: application/json
 ### Fetch Submission History for the Logged-In User
 GET http://localhost:5000/api/user-api/submissions
 
+### Fetch Solved Problems for the Logged-In User
+GET http://localhost:5000/api/user-api/solved-problems
+
 ### Fetch Public User Leaderboard (Sorted by points descending)
 GET http://localhost:5000/api/user-api/leaderboard
+
+
+### Dry-Run User Code (POST /run)
+POST http://localhost:5000/api/user-api/run
+Content-Type: application/json
+
+{
+  "problemId": "6a130c0b401cd7cfde71b683",
+  "code": "print('hello')",
+  "language": "python"
+}
+
+### Edit User Profile (PUT /edit-profile)
+PUT http://localhost:5000/api/user-api/edit-profile
+Content-Type: application/json
+
+{
+  "firstName": "user1",
+  "lastName": "user1",
+  "username": "user1",
+  "email": "user1@gmail.com",
+  "password": "user1@123",
+  "profileImage": "https://example.com/avatar.png"
+}
+
+### Retrieve Details of a Specific Past Submission by ID
+GET http://localhost:5000/api/user-api/submissions/6a130c0b401cd7cfde71b683
 
 
 ### ADMIN ENDPOINTS (Requires 'ADMIN' Role Token)

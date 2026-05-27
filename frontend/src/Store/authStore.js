@@ -14,6 +14,10 @@ export const useAuthStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const data = await authService.loginUser(emailOrUsername, password);
+      // Persist the JWT token in localStorage
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       set({
         user: data.user,
         isAuthenticated: true,
@@ -47,6 +51,8 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       console.error('Logout error:', err.message);
     } finally {
+      // Clear the JWT token from localStorage
+      localStorage.removeItem('token');
       set({
         user: null,
         isAuthenticated: false,
@@ -67,6 +73,8 @@ export const useAuthStore = create((set) => ({
       });
       return data.profile;
     } catch (err) {
+      // If fetching fails, clear invalid token
+      localStorage.removeItem('token');
       set({
         user: null,
         isAuthenticated: false,

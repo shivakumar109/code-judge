@@ -6,6 +6,23 @@ import { verifyToken } from '../Middlewares/verifyToken.js';
 const router = express.Router();
 
 /**
+ * GET /problems
+ * Retrieve all coding challenges (including active, inactive, and full hidden test cases) for admin auditing.
+ */
+router.get('/problems', verifyToken('ADMIN'), async (req, res) => {
+  try {
+    const problems = await Problem.find().sort({ createdAt: -1 });
+    return res.status(200).json({
+      message: 'All problems retrieved successfully for administration',
+      problems,
+    });
+  } catch (error) {
+    console.error('Error fetching admin problems:', error);
+    return res.status(500).json({ message: 'Internal server error while retrieving problem directory' });
+  }
+});
+
+/**
  * POST /problems
  * Create a new coding problem (requires at least 3 hidden test cases).
  */

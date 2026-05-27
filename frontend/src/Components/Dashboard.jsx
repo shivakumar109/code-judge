@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useProblemStore } from '../Store/problemStore.js';
 import { useAuthStore } from '../Store/authStore.js';
-import { Search, Filter, CheckCircle, HelpCircle, Trophy, BarChart } from 'lucide-react';
+import { Search, Filter, CheckCircle, HelpCircle, Trophy, BarChart, Target } from 'lucide-react';
 
 export const Dashboard = () => {
   const { 
@@ -65,6 +65,22 @@ export const Dashboard = () => {
   const mediumCount = problems.filter(p => p.difficulty === 'Medium').length;
   const hardCount = problems.filter(p => p.difficulty === 'Hard').length;
   const solvedCount = user?.solvedProblems?.length || 0;
+
+  // Cross-reference solved problems to get exact remaining counts per difficulty
+  const solvedProblemIds = (user?.solvedProblems || []).map((sp) => (sp._id || sp).toString());
+  const solvedEasyCount = problems.filter(
+    (p) => p.difficulty === 'Easy' && solvedProblemIds.includes(p._id.toString())
+  ).length;
+  const solvedMediumCount = problems.filter(
+    (p) => p.difficulty === 'Medium' && solvedProblemIds.includes(p._id.toString())
+  ).length;
+  const solvedHardCount = problems.filter(
+    (p) => p.difficulty === 'Hard' && solvedProblemIds.includes(p._id.toString())
+  ).length;
+
+  const remainingEasyCount = Math.max(0, easyCount - solvedEasyCount);
+  const remainingMediumCount = Math.max(0, mediumCount - solvedMediumCount);
+  const remainingHardCount = Math.max(0, hardCount - solvedHardCount);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -316,6 +332,31 @@ export const Dashboard = () => {
                     style={{ width: `${totalCount ? (hardCount / totalCount) * 100 : 0}%` }} 
                   />
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Remaining Tasks Card */}
+          <div className="glass-card rounded-3xl p-6 border border-white/5 shadow-xl space-y-4 bg-gradient-to-br from-slate-900/40 to-indigo-950/5 animate-in fade-in duration-300">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Target className="h-5 w-5 text-indigo-400" />
+              Remaining Problems
+            </h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Here are the remaining challenges you need to solve to complete each category:
+            </p>
+            <div className="space-y-2.5 text-xs">
+              <div className="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-xl border border-white/5 hover:border-slate-850 hover:bg-slate-900/80 transition-all">
+                <span className="text-emerald-400 font-bold">Easy Remaining</span>
+                <span className="font-extrabold text-slate-200">{remainingEasyCount} left</span>
+              </div>
+              <div className="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-xl border border-white/5 hover:border-slate-850 hover:bg-slate-900/80 transition-all">
+                <span className="text-amber-400 font-bold">Medium Remaining</span>
+                <span className="font-extrabold text-slate-200">{remainingMediumCount} left</span>
+              </div>
+              <div className="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-xl border border-white/5 hover:border-slate-850 hover:bg-slate-900/80 transition-all">
+                <span className="text-rose-400 font-bold">Hard Remaining</span>
+                <span className="font-extrabold text-slate-200">{remainingHardCount} left</span>
               </div>
             </div>
           </div>

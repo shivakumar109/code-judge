@@ -35,14 +35,16 @@ export const Navbar = () => {
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-8 font-medium">
-          <Link
-            to="/problems"
-            className={`transition-colors duration-200 text-sm ${
-              isActive('/problems') || isActive('/') ? 'text-indigo-400 font-semibold' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Problems
-          </Link>
+          {(!isAuthenticated || user?.role !== 'admin') && (
+            <Link
+              to="/problems"
+              className={`transition-colors duration-200 text-sm ${
+                isActive('/problems') || isActive('/') ? 'text-indigo-400 font-semibold' : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              Problems
+            </Link>
+          )}
           <Link
             to="/leaderboard"
             className={`transition-colors duration-200 text-sm ${
@@ -79,46 +81,62 @@ export const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 rounded-xl bg-slate-800/40 border border-white/5 pl-3 pr-2 py-1.5 hover:bg-slate-800/80 transition-colors focus:outline-none"
+                  className="flex items-center gap-2.5 rounded-xl bg-slate-800/40 border border-white/5 pl-2.5 pr-2 py-1.5 hover:bg-slate-800/80 transition-all focus:outline-none cursor-pointer"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold text-xs shadow-md">
-                    {user?.username?.substring(0, 2).toUpperCase()}
+                  <div className="h-8 w-8 rounded-lg overflow-hidden border border-white/10 flex items-center justify-center bg-slate-900 shrink-0 shadow-md">
+                    {user?.profileImage ? (
+                      <img 
+                        src={user.profileImage} 
+                        alt={user?.username} 
+                        className="h-full w-full object-cover" 
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+                        }}
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold text-xs">
+                        {user?.username?.substring(0, 2).toUpperCase()}
+                      </div>
+                    )}
                   </div>
-                  <span className="hidden sm:block text-xs font-semibold text-slate-200">{user?.username}</span>
-                  <ChevronDown className="h-4 w-4 text-slate-400 transition-transform duration-200" style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'none' }} />
+                  <span className="hidden sm:block text-xs font-bold text-slate-200">{user?.username}</span>
+                  <ChevronDown className="h-4 w-4 text-slate-400 transition-transform duration-200 shrink-0" style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'none' }} />
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-52 origin-top-right rounded-2xl glass-card p-2 shadow-2xl border border-white/10 ring-1 ring-black ring-opacity-5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                    <div className="px-3 py-2 border-b border-white/5 text-xs text-slate-400 font-semibold">
-                      Signed in as <span className="text-slate-200 block truncate">{user?.email}</span>
+                  <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-[#0c0f17] p-2 shadow-2xl border border-white/10 ring-1 ring-black ring-opacity-5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                    <div className="px-3.5 py-2.5 border-b border-white/5 text-xxs text-slate-450 font-bold uppercase tracking-wider">
+                      Signed in as <span className="text-slate-200 block truncate normal-case mt-0.5 font-semibold text-xs">{user?.email}</span>
                     </div>
 
-                    <Link
-                      to="/profile"
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-350 hover:bg-indigo-600/20 hover:text-indigo-200 transition-colors mt-1"
-                    >
-                      <User className="h-4 w-4 text-indigo-400" />
-                      My Profile
-                    </Link>
+                    {user?.role !== 'admin' && (
+                      <Link
+                        to="/profile"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs text-slate-350 hover:bg-indigo-500/10 hover:text-indigo-200 transition-colors mt-1 font-semibold"
+                      >
+                        <User className="h-4 w-4 text-indigo-400 shrink-0" />
+                        My Profile
+                      </Link>
+                    )}
 
                     {user?.role === 'admin' && (
                       <Link
                         to="/admin"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs text-slate-350 hover:bg-violet-600/20 hover:text-violet-200 transition-colors mt-1"
+                        className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs text-slate-350 hover:bg-violet-500/10 hover:text-violet-200 transition-colors mt-1 font-semibold"
                       >
-                        <Shield className="h-4 w-4 text-violet-400" />
+                        <Shield className="h-4 w-4 text-violet-400 shrink-0" />
                         Admin Dashboard
                       </Link>
                     )}
 
                     <button
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors mt-1 text-left"
+                      className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors mt-1 text-left font-bold cursor-pointer"
                     >
-                      <LogOut className="h-4 w-4" />
+                      <LogOut className="h-4 w-4 shrink-0" />
                       Sign Out
                     </button>
                   </div>
@@ -157,13 +175,15 @@ export const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-[73px] left-0 w-full bg-[#0b0f19]/95 border-b border-white/5 p-6 animate-in fade-in slide-in-from-top-4 duration-300 z-40 space-y-4 shadow-2xl backdrop-blur-lg">
           <div className="flex flex-col gap-4 font-semibold text-md">
-            <Link
-              to="/problems"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`pb-2 border-b border-white/5 ${isActive('/problems') || isActive('/') ? 'text-indigo-400' : 'text-slate-300'}`}
-            >
-              Problems
-            </Link>
+            {(!isAuthenticated || user?.role !== 'admin') && (
+              <Link
+                to="/problems"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`pb-2 border-b border-white/5 ${isActive('/problems') || isActive('/') ? 'text-indigo-400' : 'text-slate-300'}`}
+              >
+                Problems
+              </Link>
+            )}
             <Link
               to="/leaderboard"
               onClick={() => setMobileMenuOpen(false)}
@@ -171,7 +191,7 @@ export const Navbar = () => {
             >
               Leaderboard
             </Link>
-            {isAuthenticated && (
+            {isAuthenticated && user?.role !== 'admin' && (
               <Link
                 to="/profile"
                 onClick={() => setMobileMenuOpen(false)}

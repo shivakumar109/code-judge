@@ -4,7 +4,7 @@ import { useAuthStore } from '../Store/authStore.js';
 import { KeyRound, User, AlertTriangle, ArrowRight, Loader2, Code2 } from 'lucide-react';
 
 export const Login = () => {
-  const { login, loading, error, isAuthenticated, setError } = useAuthStore();
+  const { login, loading, error, isAuthenticated, setError, user } = useAuthStore();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -19,9 +19,13 @@ export const Login = () => {
     setError(null);
     setFormError('');
     if (isAuthenticated) {
-      navigate('/');
+      if (user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     }
-  }, [isAuthenticated, navigate, setError]);
+  }, [isAuthenticated, user, navigate, setError]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,8 +44,12 @@ export const Login = () => {
     }
 
     try {
-      await login(emailOrUsername, password);
-      navigate('/');
+      const res = await login(emailOrUsername, password);
+      if (res?.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       // Handled by store
     }
