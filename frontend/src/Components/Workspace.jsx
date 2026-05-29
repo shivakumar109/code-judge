@@ -366,7 +366,7 @@ export const Workspace = () => {
         </div>
 
         {/* Monaco Editor Container */}
-        <div className="flex-1 min-h-[300px] border-b border-white/5">
+        <div className="h-[450px] xl:flex-1 border-b border-white/5">
           <Editor
             height="100%"
             language={language === 'cpp' ? 'cpp' : language === 'javascript' ? 'javascript' : language === 'java' ? 'java' : 'python'}
