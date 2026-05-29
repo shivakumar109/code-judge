@@ -146,7 +146,7 @@ export const Workspace = () => {
     <div className="flex flex-col xl:flex-row h-auto xl:h-[calc(100vh-80px)] overflow-y-auto xl:overflow-hidden w-full px-4 py-4 gap-4 bg-[#080b11]">
       
       {/* Left Column: Problem description & Submissions Log */}
-      <div className="flex-1 flex flex-col h-full bg-slate-900/35 border border-white/5 rounded-3xl overflow-hidden glass-card">
+      <div className="flex-1 flex flex-col h-[500px] xl:h-full bg-slate-900/35 border border-white/5 rounded-3xl overflow-hidden glass-card">
         
         {/* Navigation Tabs Header */}
         <div className="flex border-b border-white/5 bg-slate-950/40 p-2">

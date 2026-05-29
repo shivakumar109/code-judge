@@ -29,11 +29,7 @@ const pollSubmission = async (token) => {
         return data;
       }
     } catch (error) {
-      console.error(`Polling Error (Attempt ${attempt}):`, {
-        url: process.env.JUDGE0_URL,
-        message: error.message,
-        response: error.response?.data
-      });
+      console.error(`Polling Error (Attempt ${attempt}):`, error.message);
     }
 
     // Wait before polling again
@@ -73,11 +69,7 @@ export const runCode = async (code, languageId, stdin = '') => {
       memory: result.memory || 0, // KB
     };
   } catch (error) {
-    console.error("Judge0 Request Error:", {
-      url: process.env.JUDGE0_URL,
-      message: error.message,
-      response: error.response?.data
-    });
+    console.error('Judge0 runCode Service Error:', error.message);
     return {
       status: 'Internal Error',
       statusId: 13,

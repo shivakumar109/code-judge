@@ -110,7 +110,7 @@ export const Navbar = () => {
                       Signed in as <span className="text-slate-200 block truncate normal-case mt-0.5 font-semibold text-xs">{user?.email}</span>
                     </div>
 
-                    {user?.role !== 'admin' && (
+                    {isAuthenticated && (
                       <Link
                         to="/profile"
                         onClick={() => setDropdownOpen(false)}
@@ -191,7 +191,7 @@ export const Navbar = () => {
             >
               Leaderboard
             </Link>
-            {isAuthenticated && user?.role !== 'admin' && (
+            {isAuthenticated && (
               <Link
                 to="/profile"
                 onClick={() => setMobileMenuOpen(false)}

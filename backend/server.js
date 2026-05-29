@@ -37,6 +37,7 @@ const startServer = async () => {
 
 startServer();
 // Middlewares
+app.set('trust proxy', 1);
 const allowedOrigins = [
   'http://localhost:5173',
   'https://code-judge-platform.onrender.com'
