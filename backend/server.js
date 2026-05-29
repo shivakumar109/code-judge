@@ -37,8 +37,24 @@ const startServer = async () => {
 
 startServer();
 // Middlewares
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://code-judge-platform.onrender.com'
+];
+
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, postman, or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(cookieParser());
