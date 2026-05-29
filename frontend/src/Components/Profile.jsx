@@ -289,7 +289,6 @@ export const Profile = () => {
                 </span>
                 <span className="font-extrabold text-purple-450">Rank {rankLevel}</span>
               </div>
-            </div>
 
             {user?.role !== 'admin' && (
               <>
