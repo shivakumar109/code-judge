@@ -127,7 +127,7 @@ router.post('/login', async (req, res) => {
     // 6. Set token in HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' && req.hostname !== 'localhost',
       sameSite: "lax",
       path: "/"
     });
@@ -153,7 +153,7 @@ router.get("/logout",async(req,res)=>{
      //must match orginal settings
      res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production' && req.hostname !== 'localhost',
         sameSite: "lax",
         path: "/"
     });
