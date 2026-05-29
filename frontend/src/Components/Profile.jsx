@@ -245,75 +245,55 @@ export const Profile = () => {
             <h2 className="text-xl font-extrabold text-white mt-4">{user?.firstName} {user?.lastName}</h2>
             <p className="text-xs text-slate-450 mt-1">@{user?.username}</p>
 
-            <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
-              <div 
-                onClick={() => setActiveSubTab('solved')}
-                className="flex items-center justify-between text-sm bg-slate-950/20 p-2.5 rounded-xl border border-white/5 hover:border-slate-800/40 transition-all cursor-pointer group/stat"
-                title="Click to view solved problems details"
-              >
-                <span className="text-slate-400 font-semibold flex items-center gap-1.5 group-hover/stat:text-amber-400 transition-colors">
-                  <Trophy className="h-4 w-4 text-amber-400 shrink-0" />
-                  Score
-                </span>
-                <span className="font-extrabold text-amber-300 group-hover/stat:scale-105 transition-transform">{user?.points || 0} pts</span>
-              </div>
-              
-              <div 
-                onClick={() => setActiveSubTab('solved')}
-                className={`flex items-center justify-between text-sm p-2.5 rounded-xl border transition-all cursor-pointer ${
-                  activeSubTab === 'solved'
-                    ? 'bg-indigo-650/20 text-indigo-400 border-indigo-500/20 shadow-md font-bold'
-                    : 'bg-slate-950/20 text-slate-400 border-white/5 hover:bg-slate-800/20 hover:text-slate-200'
-                }`}
-                title="Click to view all solved problems"
-              >
-                <span className="font-semibold flex items-center gap-1.5">
-                  <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                  Solved
-                </span>
-                <span className="font-extrabold text-emerald-400">{solvedCount} Problems</span>
-              </div>
-
-              <div 
-                onClick={() => setActiveSubTab('overview')}
-                className={`flex items-center justify-between text-sm p-2.5 rounded-xl border transition-all cursor-pointer ${
-                  activeSubTab === 'overview'
-                    ? 'bg-indigo-650/20 text-indigo-400 border-indigo-500/20 shadow-md font-bold'
-                    : 'bg-slate-950/20 text-slate-400 border-white/5 hover:bg-slate-800/20 hover:text-slate-200'
-                }`}
-                title="Click to view Rank level overview"
-              >
-                <span className="text-slate-450 font-semibold flex items-center gap-1.5">
-                  <Shield className="h-4 w-4 text-purple-400 shrink-0" />
-                  Level
-                </span>
-                <span className="font-extrabold text-purple-450">Rank {rankLevel}</span>
-              </div>
-
             {user?.role !== 'admin' && (
-              <>
-                <div className="mt-4 flex gap-4">
-                  <div className="flex-1 rounded-2xl bg-slate-900/40 border border-white/5 p-3 text-center">
-                    <span className="block text-slate-400 text-xxs font-bold uppercase tracking-wider">Score</span>
-                    <span className="block text-amber-400 font-extrabold text-sm mt-1">{points} pts</span>
-                  </div>
-                  <div className="flex-1 rounded-2xl bg-slate-900/40 border border-white/5 p-3 text-center">
-                    <span className="block text-slate-400 text-xxs font-bold uppercase tracking-wider">Solved</span>
-                    <span className="block text-emerald-400 font-extrabold text-sm mt-1">{solvedCount} Problems</span>
-                  </div>
+              <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
+                <div 
+                  onClick={() => setActiveSubTab('solved')}
+                  className="flex items-center justify-between text-sm bg-slate-950/20 p-2.5 rounded-xl border border-white/5 hover:border-slate-800/40 transition-all cursor-pointer group/stat"
+                  title="Click to view solved problems details"
+                >
+                  <span className="text-slate-400 font-semibold flex items-center gap-1.5 group-hover/stat:text-amber-400 transition-colors">
+                    <Trophy className="h-4 w-4 text-amber-400 shrink-0" />
+                    Score
+                  </span>
+                  <span className="font-extrabold text-amber-300 group-hover/stat:scale-105 transition-transform">{user?.points || 0} pts</span>
+                </div>
+                
+                <div 
+                  onClick={() => setActiveSubTab('solved')}
+                  className={`flex items-center justify-between text-sm p-2.5 rounded-xl border transition-all cursor-pointer ${
+                    activeSubTab === 'solved'
+                      ? 'bg-indigo-650/20 text-indigo-400 border-indigo-500/20 shadow-md font-bold'
+                      : 'bg-slate-950/20 text-slate-400 border-white/5 hover:bg-slate-800/20 hover:text-slate-200'
+                  }`}
+                  title="Click to view all solved problems"
+                >
+                  <span className="font-semibold flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
+                    Solved
+                  </span>
+                  <span className="font-extrabold text-emerald-400">{solvedCount} Problems</span>
                 </div>
 
-                {/* Level badge */}
-                <div className="mt-4 rounded-2xl bg-slate-950/60 border border-white/5 p-3.5 flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-purple-400" />
-                    <span className="text-slate-300 text-xs font-semibold">Level</span>
-                  </div>
-                  <span className="text-purple-400 font-extrabold text-sm">Rank {rankLevel}</span>
+                <div 
+                  onClick={() => setActiveSubTab('overview')}
+                  className={`flex items-center justify-between text-sm p-2.5 rounded-xl border transition-all cursor-pointer ${
+                    activeSubTab === 'overview'
+                      ? 'bg-indigo-650/20 text-indigo-400 border-indigo-500/20 shadow-md font-bold'
+                      : 'bg-slate-950/20 text-slate-400 border-white/5 hover:bg-slate-800/20 hover:text-slate-200'
+                  }`}
+                  title="Click to view Rank level overview"
+                >
+                  <span className="text-slate-450 font-semibold flex items-center gap-1.5">
+                    <Shield className="h-4 w-4 text-purple-400 shrink-0" />
+                    Level
+                  </span>
+                  <span className="font-extrabold text-purple-450">Rank {rankLevel}</span>
                 </div>
-              </>
+
+
+              </div>
             )}
-            </div>
 
             {/* Menu options buttons */}
             <div className="mt-8 flex flex-col gap-2">
@@ -329,29 +309,33 @@ export const Profile = () => {
                 Profile Overview
               </button>
               
-              <button
-                onClick={() => setActiveSubTab('solved')}
-                className={`w-full flex items-center gap-3 px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer border ${
-                  activeSubTab === 'solved'
-                    ? 'bg-indigo-650/25 text-indigo-400 border-indigo-500/20 shadow-lg'
-                    : 'text-slate-400 border-transparent hover:text-slate-200 hover:bg-slate-800/30'
-                }`}
-              >
-                <Trophy className="h-4 w-4 shrink-0" />
-                Solved Problems
-              </button>
+              {user?.role !== 'admin' && (
+                <>
+                  <button
+                    onClick={() => setActiveSubTab('solved')}
+                    className={`w-full flex items-center gap-3 px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer border ${
+                      activeSubTab === 'solved'
+                        ? 'bg-indigo-650/25 text-indigo-400 border-indigo-500/20 shadow-lg'
+                        : 'text-slate-400 border-transparent hover:text-slate-200 hover:bg-slate-800/30'
+                    }`}
+                  >
+                    <Trophy className="h-4 w-4 shrink-0" />
+                    Solved Problems
+                  </button>
 
-              <button
-                onClick={() => setActiveSubTab('submissions')}
-                className={`w-full flex items-center gap-3 px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer border ${
-                  activeSubTab === 'submissions'
-                    ? 'bg-indigo-650/25 text-indigo-400 border-indigo-500/20 shadow-lg'
-                    : 'text-slate-400 border-transparent hover:text-slate-200 hover:bg-slate-800/30'
-                }`}
-              >
-                <Activity className="h-4 w-4 shrink-0" />
-                Submissions ({totalSubmissions})
-              </button>
+                  <button
+                    onClick={() => setActiveSubTab('submissions')}
+                    className={`w-full flex items-center gap-3 px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer border ${
+                      activeSubTab === 'submissions'
+                        ? 'bg-indigo-650/25 text-indigo-400 border-indigo-500/20 shadow-lg'
+                        : 'text-slate-400 border-transparent hover:text-slate-200 hover:bg-slate-800/30'
+                    }`}
+                  >
+                    <Activity className="h-4 w-4 shrink-0" />
+                    Submissions ({totalSubmissions})
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={() => setActiveSubTab('settings')}

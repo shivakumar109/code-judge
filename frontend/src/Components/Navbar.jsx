@@ -36,14 +36,24 @@ export const Navbar = () => {
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-8 font-medium">
           {(!isAuthenticated || user?.role !== 'admin') && (
-            <Link
-              to="/problems"
-              className={`transition-colors duration-200 text-sm ${
-                isActive('/problems') || isActive('/') ? 'text-indigo-400 font-semibold' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              Problems
-            </Link>
+            <>
+              <Link
+                to="/problems"
+                className={`transition-colors duration-200 text-sm ${
+                  isActive('/problems') || isActive('/') ? 'text-indigo-400 font-semibold' : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                Problems
+              </Link>
+              <Link
+                to="/leaderboard"
+                className={`transition-colors duration-200 text-sm ${
+                  isActive('/leaderboard') ? 'text-indigo-400 font-semibold' : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                Leaderboard
+              </Link>
+            </>
           )}
           {isAuthenticated && user?.role === 'admin' && (
             <Link
@@ -64,10 +74,12 @@ export const Navbar = () => {
             <div className="flex items-center gap-3 sm:gap-4">
               
               {/* User Points Badge */}
-              <div className="flex items-center gap-1.5 rounded-full bg-slate-900/60 border border-amber-500/20 px-3.5 py-1.5 shadow-sm text-xs sm:text-sm">
-                <Trophy className="h-4 w-4 text-amber-400" />
-                <span className="font-bold text-amber-300">{user?.points || 0} pts</span>
-              </div>
+              {user?.role !== 'admin' && (
+                <div className="flex items-center gap-1.5 rounded-full bg-slate-900/60 border border-amber-500/20 px-3.5 py-1.5 shadow-sm text-xs sm:text-sm">
+                  <Trophy className="h-4 w-4 text-amber-400" />
+                  <span className="font-bold text-amber-300">{user?.points || 0} pts</span>
+                </div>
+              )}
 
               {/* Profile Dropdown */}
               <div className="relative">
@@ -168,13 +180,22 @@ export const Navbar = () => {
         <div className="md:hidden absolute top-[73px] left-0 w-full bg-[#0b0f19]/95 border-b border-white/5 p-6 animate-in fade-in slide-in-from-top-4 duration-300 z-40 space-y-4 shadow-2xl backdrop-blur-lg">
           <div className="flex flex-col gap-4 font-semibold text-md">
             {(!isAuthenticated || user?.role !== 'admin') && (
-              <Link
-                to="/problems"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`pb-2 border-b border-white/5 ${isActive('/problems') || isActive('/') ? 'text-indigo-400' : 'text-slate-300'}`}
-              >
-                Problems
-              </Link>
+              <>
+                <Link
+                  to="/problems"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`pb-2 border-b border-white/5 ${isActive('/problems') || isActive('/') ? 'text-indigo-400' : 'text-slate-300'}`}
+                >
+                  Problems
+                </Link>
+                <Link
+                  to="/leaderboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`pb-2 border-b border-white/5 ${isActive('/leaderboard') ? 'text-indigo-400' : 'text-slate-300'}`}
+                >
+                  Leaderboard
+                </Link>
+              </>
             )}
             {isAuthenticated && (
               <Link
