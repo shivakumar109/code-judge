@@ -291,6 +291,31 @@ export const Profile = () => {
               </div>
             </div>
 
+            {user?.role !== 'admin' && (
+              <>
+                <div className="mt-4 flex gap-4">
+                  <div className="flex-1 rounded-2xl bg-slate-900/40 border border-white/5 p-3 text-center">
+                    <span className="block text-slate-400 text-xxs font-bold uppercase tracking-wider">Score</span>
+                    <span className="block text-amber-400 font-extrabold text-sm mt-1">{points} pts</span>
+                  </div>
+                  <div className="flex-1 rounded-2xl bg-slate-900/40 border border-white/5 p-3 text-center">
+                    <span className="block text-slate-400 text-xxs font-bold uppercase tracking-wider">Solved</span>
+                    <span className="block text-emerald-400 font-extrabold text-sm mt-1">{solvedCount} Problems</span>
+                  </div>
+                </div>
+
+                {/* Level badge */}
+                <div className="mt-4 rounded-2xl bg-slate-950/60 border border-white/5 p-3.5 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-purple-400" />
+                    <span className="text-slate-300 text-xs font-semibold">Level</span>
+                  </div>
+                  <span className="text-purple-400 font-extrabold text-sm">Rank {rankLevel}</span>
+                </div>
+              </>
+            )}
+            </div>
+
             {/* Menu options buttons */}
             <div className="mt-8 flex flex-col gap-2">
               <button
@@ -420,98 +445,102 @@ export const Profile = () => {
               </div>
 
               {/* Gamified Level & Progression Card */}
-              <div className="glass-card rounded-3xl p-6 border border-white/5 shadow-xl relative overflow-hidden bg-gradient-to-br from-indigo-950/15 to-purple-950/15">
-                <div className="absolute right-0 top-0 h-32 w-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
-                <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-purple-400 animate-pulse-soft" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Rank Progression</span>
-                  </div>
-                  <span className="font-semibold text-purple-400 text-xs">Level {rankLevel}</span>
-                </div>
-
-                <div className="space-y-3.5">
-                  <div className="flex justify-between text-xs font-medium text-slate-350">
-                    <span>Rank Progression Milestone</span>
-                    <span className="font-extrabold text-indigo-400">{progressPercent} / 100 XP</span>
-                  </div>
-                  
-                  {/* Progress Bar Container */}
-                  <div className="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5 p-0.5">
-                    <div 
-                      className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-indigo-400 rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(99,102,241,0.5)]" 
-                      style={{ width: `${progressPercent}%` }} 
-                    />
+              {user?.role !== 'admin' && (
+                <div className="glass-card rounded-3xl p-6 border border-white/5 shadow-xl relative overflow-hidden bg-gradient-to-br from-indigo-950/15 to-purple-950/15">
+                  <div className="absolute right-0 top-0 h-32 w-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+                  <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-purple-400 animate-pulse-soft" />
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Rank Progression</span>
+                    </div>
+                    <span className="font-semibold text-purple-400 text-xs">Level {rankLevel}</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xxs text-slate-450 mt-1 pl-1">
-                    <Info className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
-                    <span>You need <strong className="text-slate-300 font-semibold">{pointsNeeded} points</strong> to level up to <strong className="text-purple-400 font-semibold">Rank {rankLevel + 1}</strong>. Keep solving challenges!</span>
+                  <div className="space-y-3.5">
+                    <div className="flex justify-between text-xs font-medium text-slate-350">
+                      <span>Rank Progression Milestone</span>
+                      <span className="font-extrabold text-indigo-400">{progressPercent} / 100 XP</span>
+                    </div>
+                    
+                    {/* Progress Bar Container */}
+                    <div className="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5 p-0.5">
+                      <div 
+                        className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-indigo-400 rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(99,102,241,0.5)]" 
+                        style={{ width: `${progressPercent}%` }} 
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-xxs text-slate-450 mt-1 pl-1">
+                      <Info className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                      <span>You need <strong className="text-slate-300 font-semibold">{pointsNeeded} points</strong> to level up to <strong className="text-purple-400 font-semibold">Rank {rankLevel + 1}</strong>. Keep solving challenges!</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Grid: Advanced Statistics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
-                {/* Accuracy gauge card */}
-                <div className="glass-card rounded-3xl p-6 border border-white/5 bg-slate-900/20 shadow-xl flex flex-col justify-between gap-4">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2.5">
-                    <Activity className="h-4 w-4 text-violet-450 shrink-0" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Accuracy Rating</span>
-                  </div>
-                  <div className="text-center py-2">
-                    <span className="text-4xl font-extrabold text-white tracking-tight">{accuracy}%</span>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Solution Accuracy</p>
-                  </div>
-                  <div className="text-xxs text-slate-450 text-center border-t border-white/5 pt-2.5 leading-relaxed">
-                    Accepted: <strong className="text-emerald-400 font-semibold">{acceptedCount}</strong> of <strong className="text-slate-300 font-semibold">{totalSubmissions}</strong> total runs.
-                  </div>
-                </div>
-
-                {/* Submissions breakdown */}
-                <div className="glass-card rounded-3xl p-6 border border-white/5 bg-slate-900/20 shadow-xl flex flex-col justify-between gap-4">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2.5">
-                    <FileCode className="h-4 w-4 text-indigo-400 shrink-0" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Total Submissions</span>
-                  </div>
-                  <div className="text-center py-2">
-                    <span className="text-4xl font-extrabold text-white tracking-tight">{solvedCount}</span>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Solved Tasks</p>
-                  </div>
-                  <div className="text-xxs text-slate-450 text-center border-t border-white/5 pt-2.5 leading-relaxed">
-                    Overall performance ranking details across platform solvers.
-                  </div>
-                </div>
-
-                {/* Task Difficulty Breakdown Bar */}
-                <div className="glass-card rounded-3xl p-6 border border-white/5 bg-slate-900/20 shadow-xl flex flex-col justify-between gap-4">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2.5">
-                    <Award className="h-4 w-4 text-amber-400 shrink-0" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Task Breakdown</span>
-                  </div>
+              {user?.role !== 'admin' && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   
-                  <div className="space-y-2 text-xxs font-mono">
-                    <div className="flex justify-between items-center text-emerald-400">
-                      <span>Easy Solved</span>
-                      <span className="font-bold">{solvedEasy}</span>
+                  {/* Accuracy gauge card */}
+                  <div className="glass-card rounded-3xl p-6 border border-white/5 bg-slate-900/20 shadow-xl flex flex-col justify-between gap-4">
+                    <div className="flex items-center gap-2 border-b border-white/5 pb-2.5">
+                      <Activity className="h-4 w-4 text-violet-450 shrink-0" />
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Accuracy Rating</span>
                     </div>
-                    <div className="flex justify-between items-center text-amber-400">
-                      <span>Medium Solved</span>
-                      <span className="font-bold">{solvedMedium}</span>
+                    <div className="text-center py-2">
+                      <span className="text-4xl font-extrabold text-white tracking-tight">{accuracy}%</span>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Solution Accuracy</p>
                     </div>
-                    <div className="flex justify-between items-center text-rose-400">
-                      <span>Hard Solved</span>
-                      <span className="font-bold">{solvedHard}</span>
+                    <div className="text-xxs text-slate-450 text-center border-t border-white/5 pt-2.5 leading-relaxed">
+                      Accepted: <strong className="text-emerald-400 font-semibold">{acceptedCount}</strong> of <strong className="text-slate-300 font-semibold">{totalSubmissions}</strong> total runs.
                     </div>
                   </div>
 
-                  <div className="text-xxs text-slate-450 text-center border-t border-white/5 pt-2.5 leading-relaxed">
-                    Difficulty statistics from solved code exercises.
+                  {/* Submissions breakdown */}
+                  <div className="glass-card rounded-3xl p-6 border border-white/5 bg-slate-900/20 shadow-xl flex flex-col justify-between gap-4">
+                    <div className="flex items-center gap-2 border-b border-white/5 pb-2.5">
+                      <FileCode className="h-4 w-4 text-indigo-400 shrink-0" />
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Total Submissions</span>
+                    </div>
+                    <div className="text-center py-2">
+                      <span className="text-4xl font-extrabold text-white tracking-tight">{solvedCount}</span>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">Solved Tasks</p>
+                    </div>
+                    <div className="text-xxs text-slate-450 text-center border-t border-white/5 pt-2.5 leading-relaxed">
+                      Overall performance ranking details across platform solvers.
+                    </div>
                   </div>
+
+                  {/* Task Difficulty Breakdown Bar */}
+                  <div className="glass-card rounded-3xl p-6 border border-white/5 bg-slate-900/20 shadow-xl flex flex-col justify-between gap-4">
+                    <div className="flex items-center gap-2 border-b border-white/5 pb-2.5">
+                      <Award className="h-4 w-4 text-amber-400 shrink-0" />
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Task Breakdown</span>
+                    </div>
+                    
+                    <div className="space-y-2 text-xxs font-mono">
+                      <div className="flex justify-between items-center text-emerald-400">
+                        <span>Easy Solved</span>
+                        <span className="font-bold">{solvedEasy}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-amber-400">
+                        <span>Medium Solved</span>
+                        <span className="font-bold">{solvedMedium}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-rose-400">
+                        <span>Hard Solved</span>
+                        <span className="font-bold">{solvedHard}</span>
+                      </div>
+                    </div>
+
+                    <div className="text-xxs text-slate-450 text-center border-t border-white/5 pt-2.5 leading-relaxed">
+                      Difficulty statistics from solved code exercises.
+                    </div>
+                  </div>
+
                 </div>
-
-              </div>
+              )}
 
               {/* Action Button: Edit profile toggle */}
               <div className="flex justify-end pt-2">

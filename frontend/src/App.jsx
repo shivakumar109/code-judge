@@ -39,6 +39,15 @@ const RequireAdmin = ({ children }) => {
   return children;
 };
 
+// Component to handle redirecting admins from student dashboard
+const StudentOrAdminDashboard = () => {
+  const { user } = useAuthStore();
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+  return <Dashboard />;
+};
+
 export const App = () => {
   const { fetchProfile } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
@@ -79,7 +88,7 @@ export const App = () => {
               path="/"
               element={
                 <RequireAuth>
-                  <Dashboard />
+                  <StudentOrAdminDashboard />
                 </RequireAuth>
               }
             />
@@ -87,7 +96,7 @@ export const App = () => {
               path="/problems"
               element={
                 <RequireAuth>
-                  <Dashboard />
+                  <StudentOrAdminDashboard />
                 </RequireAuth>
               }
             />

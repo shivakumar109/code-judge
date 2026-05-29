@@ -45,14 +45,6 @@ export const Navbar = () => {
               Problems
             </Link>
           )}
-          <Link
-            to="/leaderboard"
-            className={`transition-colors duration-200 text-sm ${
-              isActive('/leaderboard') ? 'text-indigo-400 font-semibold' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Leaderboard
-          </Link>
           {isAuthenticated && user?.role === 'admin' && (
             <Link
               to="/admin"
@@ -184,13 +176,6 @@ export const Navbar = () => {
                 Problems
               </Link>
             )}
-            <Link
-              to="/leaderboard"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`pb-2 border-b border-white/5 ${isActive('/leaderboard') ? 'text-indigo-400' : 'text-slate-300'}`}
-            >
-              Leaderboard
-            </Link>
             {isAuthenticated && (
               <Link
                 to="/profile"
