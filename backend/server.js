@@ -10,6 +10,13 @@ import seedDB  from './seed.js';
 
 dotenv.config();
 
+console.log("=========================================");
+console.log("SERVER STARTUP ENVIRONMENT INFO:");
+console.log("PORT =", process.env.PORT);
+console.log("NODE_ENV =", process.env.NODE_ENV);
+console.log("JUDGE0_URL =", process.env.JUDGE0_URL);
+console.log("=========================================");
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
