@@ -16,7 +16,7 @@ export const useSubmissionStore = create((set, get) => ({
   clearResults: () => set({ verdict: null, runtime: null, memory: null, error: null, runResult: null, runError: null }),
 
   submitSolution: async (problemId, code, language) => {
-    set({ submitting: true, error: null, verdict: null, runtime: null, memory: null });
+    set({ submitting: true, error: null, verdict: null, runtime: null, memory: null, runResult: null, runError: null });
     try {
       const data = await submissionService.submitCode(problemId, code, language);
       set({
@@ -36,7 +36,7 @@ export const useSubmissionStore = create((set, get) => ({
   },
 
   executeCodeDraft: async (problemId, code, language, customInput) => {
-    set({ running: true, runError: null, runResult: null });
+    set({ running: true, runError: null, runResult: null, error: null, verdict: null, runtime: null, memory: null });
     try {
       const data = await submissionService.runCode(problemId, code, language, customInput);
       set({
